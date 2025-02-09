@@ -3,7 +3,7 @@ from enum import Enum
 from htmlnode import HTMLNode, LeafNode
 
 class TextType(Enum):
-    NORMAL = "normal"
+    TEXT = "text"
     BOLD = "bold"
     ITALIC = "italic"
     CODE = "code"
@@ -28,7 +28,7 @@ def text_node_to_html_node(text_node):
     if type(text_node) != TextNode:
         raise Exception("text_node must be a TextNode")
     match(text_node.text_type):
-        case TextType.NORMAL:
+        case TextType.TEXT:
             return LeafNode(None, text_node.text)
         case TextType.BOLD:
             return LeafNode("b", text_node.text)
@@ -42,3 +42,23 @@ def text_node_to_html_node(text_node):
             return LeafNode("img", None, {"src": text_node.url, "alt": text_node.text})
         case _:
             raise Exception("Unknown text type")
+
+def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    new_nodes = []
+    for old_node in old_nodes:
+        if old_node.text_type != TextType.TEXT:
+            new_nodes.append(old_node)
+            continue
+        split_nodes = []
+        sections = old_node.text.split(delimiter)
+        if len(sections) % 2 == 0:
+            raise ValueError("Invalid markdown: unclosed formatting")
+        for i in range(len(sections)):
+            if sections[i] == "":
+                continue
+            if i % 2 == 0: # Outer section
+                split_nodes.append(TextNode(sections[i], TextType.TEXT))
+            else: # Formatted section
+                split_nodes.append(TextNode(sections[i], text_type))
+        new_nodes.extend(split_nodes)
+    return new_nodes
