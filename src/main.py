@@ -1,8 +1,9 @@
 from textnode import *
 from htmlnode import *
+from generate import *
 
 def main():
-    t = TextNode("This is a text node", TextType.BOLD, "https://www.boot.dev")
-    print(t)
+    clear_directory('./public')
+    copy_directory('./static', './public')
 
 main()
