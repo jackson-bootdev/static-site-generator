@@ -80,5 +80,15 @@ class TestTextToTextNodes(unittest.TestCase):
         ]
         self.assertEqual(expect, text_to_textnodes(text))
 
+class TestExtractHeader(unittest.TestCase):
+    def test_extract_header(self):
+        markdown = "## This is not the correct header\n# This is the correct header"
+        expect = "# This is the correct header"
+        self.assertEqual(expect, extract_title(markdown))
+    
+    def text_extract_header_fail(self):
+        markdown = "## This is not the correct header\n### This is also not the correct header"
+        self.assertRaises(Exception("No h1 header found"), extract_title(markdown))
+
 if __name__ == "__main__":
     unittest.main()
